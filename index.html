@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="styles.css">
+	</head>
+<body>
+	<div>
+		<canvas id="myCanvas" style="border:1px solid #d3d3d3;">Your browser does not support the HTML5 canvas tag.</canvas>
+		<button onclick="canvasClear()">Clear 🎨</button>
+	</div>
+</body>
+<script>
+const color=["rgb(255,0,0)","rgb(0, 0, 255)","rgb(0, 255, 0)","rgb(255,165,0)","rgb(0, 0, 0)"];
+
+
+var c = document.getElementById("myCanvas");
+c.width = document.body.clientWidth;
+c.height = document.body.clientHeight;
+var ctx = c.getContext("2d");
+var x1,x2,y1,y2;
+var state = [];
+var toBeMoved = null;
+var toBeRemoved = 0;
+
+const canvasClear = () =>{
+	state = []	
+	ctx.clearRect(0, 0, c.width, c.height);
+}
+
+c.addEventListener('mousedown', ()=>{
+	x1 = event.clientX;      
+	y1 = event.clientY;
+	console.log("Onclick coordsz: ",x1,y1);
+	toBeRemoved = 0;
+	for(st of state){
+		if(st[2]>0){
+			if(x1>=st[0] && x1<=st[2]+st[0]){
+				if(st[3]>0){
+					if(y1>=st[1] && y1<=st[3]+st[1]){
+						console.log('Inside the +ve x +ve y condition');
+						toBeMoved = st;
+						break;
+					}else{
+						console.log('No match found for state',st);
+					}
+				}else{
+					if(y1<=st[1] && y1>=st[3]+st[1]){
+						console.log('Inside the +ve x -ve y condition');
+						toBeMoved = st;
+						break;
+					}else{
+						console.log('No match found for state',st);
+					}
+				}
+			}else{
+				console.log('No match found for state',st);
+			}
+		}else{
+			if(x1>=st[2]+st[0] && x1<=st[0]){
+				if(st[3]>0){
+					if(y1>=st[1] && y1<=st[3]+st[1]){
+						console.log('Inside the -ve x +ve y condition');
+						toBeMoved = st;
+						break;
+					}else{
+						console.log('No match found for state',st);
+					}
+				}else{
+					if(y1<=st[1] && y1>=st[3]+st[1]){
+						console.log('Inside the -ve x -ve y condition');
+						toBeMoved = st;
+						break;
+					}else{
+						console.log('No match found for state',st);
+					}
+				}
+			}else{
+				console.log('No match found for state',st);
+			}
+		}
+		++toBeRemoved;
+	}
+	
+	
+}, false);
+
+c.addEventListener('mouseup', ()=>{
+	x2 = event.clientX;      
+	y2 = event.clientY;      
+	console.log("OnMouseUp coords: ",x2,y2);
+	if(toBeMoved!=null){
+		ctx.clearRect(toBeMoved[0],toBeMoved[1],toBeMoved[2],toBeMoved[3]);
+		var xdir =  x2-x1;
+		var ydir = y2-y1;
+		x1 = toBeMoved[0] + xdir;
+		y1 = toBeMoved[1] + ydir;
+		y2 = toBeMoved[3]+toBeMoved[1]+ ydir;
+		x2 = toBeMoved[2]+toBeMoved[0]+ xdir;
+		console.log(toBeRemoved)
+		state.splice(toBeRemoved,1);
+		console.log('logging state',state);
+		createRectangle(ctx);
+		
+		toBeMoved = null;
+		return;
+	}
+	
+	createRectangle(ctx);
+}, false);
+
+
+const createRectangle = (ctx)=>{
+	ctx.beginPath();
+	ctx.lineWidth = "5";
+	ctx.fillStyle = color[Math.floor((Math.random()*10)%color.length)];
+	console.log(`created new rect`)
+	ctx.rect(x1,y1,x2-x1,y2-y1);
+	state.push([x1,y1,x2-x1,y2-y1]);
+	ctx.fill();
+}
+
+</script> 
+
+
+</html>

@@ -1,0 +1,15 @@
+body{
+    
+    min-height:100%;
+    
+}
+div{
+    display: flex;
+    flex-direction: column;
+    height: 950px;
+}
+
+button{
+    justify-content: flex-end;
+    width: 5%;
+}
